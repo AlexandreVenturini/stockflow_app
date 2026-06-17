@@ -16,8 +16,6 @@ Implementa projeto completo StockFlow com auth e CRUD de produtos
 - Exclusão com diálogo de confirmação
 - Dados isolados por usuário (coleção usuarios/{uid}/produtos)
 
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
-
 ---
 d6cb4a8200bc77c7255cb1c2b5f9de20d67881c5
 Initial commit
