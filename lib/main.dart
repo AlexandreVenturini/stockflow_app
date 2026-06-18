@@ -14,7 +14,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Verifica se o usuário marcou "lembrar login" e já está autenticado
   final prefs = await SharedPreferences.getInstance();
   final lembrar = prefs.getBool('lembrar_ativo') ?? false;
   final usuarioLogado = FirebaseAuth.instance.currentUser != null;
@@ -33,7 +32,37 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'StockFlow',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1B5E20),
+          primary: const Color(0xFF2E7D32),
+          secondary: const Color(0xFFF57F17),
+          surface: const Color(0xFFF9FBF9),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF2E7D32),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: false,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF2E7D32),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF2E7D32), width: 2),
+          ),
+        ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color(0xFFF57F17),
+          foregroundColor: Colors.white,
+        ),
       ),
       initialRoute: autoLogin ? '/home' : '/',
       routes: {

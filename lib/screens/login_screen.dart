@@ -75,7 +75,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       setState(() => _carregando = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_traduzirErro(e.toString()))),
+        SnackBar(
+          content: Text(_traduzirErro(e.toString())),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
       );
     }
   }
@@ -90,87 +95,206 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      backgroundColor: const Color(0xFF1B5E20),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'E-mail',
-                  prefixIcon: Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Informe o e-mail';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _senhaController,
-                obscureText: !_verSenha,
-                decoration: InputDecoration(
-                  labelText: 'Senha',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    tooltip: _verSenha ? 'Ocultar senha' : 'Ver senha',
-                    icon: Icon(
-                        _verSenha ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _verSenha = !_verSenha),
-                  ),
-                ),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'Informe a senha';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 4),
-              // Checkbox "Lembrar e-mail"
-              Row(
+        child: Column(
+          children: [
+            // Header verde com logo
+            SizedBox(
+              height: 280,
+              width: double.infinity,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  Checkbox(
-                    value: _lembrarEmail,
-                    onChanged: (v) => setState(() => _lembrarEmail = v ?? false),
+                  // Círculos decorativos
+                  Positioned(
+                    top: -40,
+                    right: -40,
+                    child: Container(
+                      width: 180,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.05),
+                      ),
+                    ),
                   ),
-                  GestureDetector(
-                    onTap: () => setState(() => _lembrarEmail = !_lembrarEmail),
-                    child: const Text('Lembrar e-mail'),
+                  Positioned(
+                    bottom: -20,
+                    left: -30,
+                    child: Container(
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.05),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 90,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.storefront,
+                            size: 52, color: Color(0xFF2E7D32)),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'StockFlow',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      const Text(
+                        'Gestão de Estoque',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: _carregando ? null : _login,
-                  icon: _carregando
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.login),
-                  label: Text(_carregando ? 'Entrando...' : 'Entrar'),
+            ),
+
+            // Card do formulário
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(32),
+                  topRight: Radius.circular(32),
                 ),
               ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/register'),
-                child: const Text('Criar conta'),
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 280,
               ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/forgot'),
-                child: const Text('Esqueci minha senha'),
+              padding: const EdgeInsets.fromLTRB(28, 32, 28, 24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Bem-vindo de volta!',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1B5E20),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Entre para acessar o estoque',
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                    const SizedBox(height: 28),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'E-mail',
+                        prefixIcon: Icon(Icons.email_outlined, color: Color(0xFF2E7D32)),
+                      ),
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Informe o e-mail' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _senhaController,
+                      obscureText: !_verSenha,
+                      decoration: InputDecoration(
+                        labelText: 'Senha',
+                        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF2E7D32)),
+                        suffixIcon: IconButton(
+                          icon: Icon(_verSenha ? Icons.visibility_off : Icons.visibility,
+                              color: Colors.grey),
+                          onPressed: () => setState(() => _verSenha = !_verSenha),
+                        ),
+                      ),
+                      validator: (v) =>
+                          (v == null || v.isEmpty) ? 'Informe a senha' : null,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _lembrarEmail,
+                          activeColor: const Color(0xFF2E7D32),
+                          onChanged: (v) => setState(() => _lembrarEmail = v ?? false),
+                        ),
+                        GestureDetector(
+                          onTap: () => setState(() => _lembrarEmail = !_lembrarEmail),
+                          child: const Text('Lembrar e-mail',
+                              style: TextStyle(fontSize: 14)),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => Navigator.pushNamed(context, '/forgot'),
+                          child: const Text('Esqueci a senha',
+                              style: TextStyle(color: Color(0xFF2E7D32), fontSize: 13)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _carregando ? null : _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2E7D32),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: _carregando
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white))
+                            : const Text('Entrar',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w700)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Não tem conta? ',
+                            style: TextStyle(color: Colors.grey)),
+                        GestureDetector(
+                          onTap: () => Navigator.pushNamed(context, '/register'),
+                          child: const Text('Criar conta',
+                              style: TextStyle(
+                                  color: Color(0xFF2E7D32),
+                                  fontWeight: FontWeight.w700)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

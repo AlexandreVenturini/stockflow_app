@@ -1,0 +1,22 @@
+4db60793e6796c5fc5434dc860944afc3f0c5617
+.
+
+---
+8bbd90a51c164b1c4f88887b2a3026b3ddd802d0
+correções
+
+---
+ebe5f1aba9a4b8bf229af13b6c48512f13d5c45d
+Implementa projeto completo StockFlow com auth e CRUD de produtos
+
+- Sistema de autenticação: login, cadastro e recuperação de senha via Firebase Auth
+- CRUD completo de produtos usando Cloud Firestore (por usuário)
+- Tela de listagem em tempo real com StreamBuilder
+- Formulário de criação/edição com validação
+- Exclusão com diálogo de confirmação
+- Dados isolados por usuário (coleção usuarios/{uid}/produtos)
+
+---
+d6cb4a8200bc77c7255cb1c2b5f9de20d67881c5
+Initial commit
+---
