@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
+import '../widgets/captcha_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _verSenha = false;
   bool _lembrarEmail = false;
   bool _carregando = false;
+  bool _captchaOk = false;
 
   static const _keyEmail = 'lembrar_email';
   static const _keyLembrar = 'lembrar_ativo';
@@ -62,6 +64,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!_captchaOk) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Complete a verificação de segurança.'),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      return;
+    }
     setState(() => _carregando = true);
     try {
       await _salvarPreferencia();
@@ -253,6 +266,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(color: Color(0xFF2E7D32), fontSize: 13)),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 20),
+                    CaptchaWidget(
+                      onValidated: (ok) => setState(() => _captchaOk = ok),
                     ),
                     const SizedBox(height: 20),
                     SizedBox(

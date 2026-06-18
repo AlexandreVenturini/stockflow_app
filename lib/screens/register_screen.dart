@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../widgets/captcha_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,6 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _verSenha = false;
   bool _verConfirmarSenha = false;
   bool _carregando = false;
+  bool _captchaOk = false;
 
   @override
   void dispose() {
@@ -36,6 +38,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _registrar() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!_captchaOk) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Complete a verificação de segurança.'),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      return;
+    }
     setState(() => _carregando = true);
     try {
       await AuthService().registrar(
@@ -235,7 +248,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 20),
+                    CaptchaWidget(
+                      onValidated: (ok) => setState(() => _captchaOk = ok),
+                    ),
+                    const SizedBox(height: 20),
                     SizedBox(
                       height: 52,
                       child: ElevatedButton(

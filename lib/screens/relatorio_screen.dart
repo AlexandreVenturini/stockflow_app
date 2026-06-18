@@ -24,10 +24,16 @@ class RelatorioScreen extends StatelessWidget {
               produtos.fold(0, (soma, p) => soma + p.quantidade);
           final valorTotal = produtos.fold(
               0.0, (soma, p) => soma + p.preco * p.quantidade);
-          final semEstoque =
-              produtos.where((p) => p.quantidade == 0).length;
-          final estoqueAbaixo =
-              produtos.where((p) => p.quantidade > 0 && p.quantidade <= 15).length;
+          final produtosSemEstoque =
+              produtos.where((p) => p.quantidade == 0).toList();
+          final produtosAbaixo5 = produtos
+              .where((p) => p.quantidade > 0 && p.quantidade <= 5)
+              .toList();
+          final produtosAbaixo15 = produtos
+              .where((p) => p.quantidade > 5 && p.quantidade <= 15)
+              .toList();
+          final semEstoque = produtosSemEstoque.length;
+          final estoqueAbaixo = produtosAbaixo5.length + produtosAbaixo15.length;
 
           // Valor por categoria
           final Map<String, double> valorPorCategoria = {};
@@ -122,8 +128,10 @@ class RelatorioScreen extends StatelessWidget {
                       // Alertas
                       if (semEstoque > 0 || estoqueAbaixo > 0)
                         _CardAlertas(
-                            semEstoque: semEstoque,
-                            estoqueAbaixo: estoqueAbaixo),
+                          produtosSemEstoque: produtosSemEstoque,
+                          produtosAbaixo5: produtosAbaixo5,
+                          produtosAbaixo15: produtosAbaixo15,
+                        ),
 
                       if (semEstoque > 0 || estoqueAbaixo > 0)
                         const SizedBox(height: 12),
@@ -299,11 +307,15 @@ class _CardValorTotal extends StatelessWidget {
 }
 
 class _CardAlertas extends StatelessWidget {
-  final int semEstoque;
-  final int estoqueAbaixo;
+  final List<Produto> produtosSemEstoque;
+  final List<Produto> produtosAbaixo5;
+  final List<Produto> produtosAbaixo15;
 
-  const _CardAlertas(
-      {required this.semEstoque, required this.estoqueAbaixo});
+  const _CardAlertas({
+    required this.produtosSemEstoque,
+    required this.produtosAbaixo5,
+    required this.produtosAbaixo15,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -319,8 +331,7 @@ class _CardAlertas extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.warning_rounded,
-                  color: Colors.red.shade700, size: 18),
+              Icon(Icons.warning_rounded, color: Colors.red.shade700, size: 18),
               const SizedBox(width: 6),
               Text('Alertas de estoque',
                   style: TextStyle(
@@ -329,50 +340,125 @@ class _CardAlertas extends StatelessWidget {
                       fontSize: 13)),
             ],
           ),
-          const SizedBox(height: 10),
-          if (semEstoque > 0)
-            _LinhaAlerta(
+          if (produtosSemEstoque.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _SubtituloAlerta(
+              texto: 'Sem estoque (${produtosSemEstoque.length})',
               cor: Colors.red.shade700,
-              texto:
-                  '$semEstoque produto${semEstoque > 1 ? 's' : ''} sem estoque',
             ),
-          if (estoqueAbaixo > 0)
-            _LinhaAlerta(
+            const SizedBox(height: 6),
+            ...produtosSemEstoque.map((p) => _LinhaAlertaProduto(
+                  produto: p,
+                  cor: Colors.red.shade700,
+                  badge: 'ZERADO',
+                  badgeCor: Colors.red.shade700,
+                )),
+          ],
+          if (produtosAbaixo5.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _SubtituloAlerta(
+              texto: 'Crítico — abaixo de 5 un (${produtosAbaixo5.length})',
+              cor: Colors.deepOrange.shade700,
+            ),
+            const SizedBox(height: 6),
+            ...produtosAbaixo5.map((p) => _LinhaAlertaProduto(
+                  produto: p,
+                  cor: Colors.deepOrange.shade700,
+                  badge: '${p.quantidade} un',
+                  badgeCor: Colors.deepOrange.shade700,
+                )),
+          ],
+          if (produtosAbaixo15.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _SubtituloAlerta(
+              texto: 'Baixo — abaixo de 15 un (${produtosAbaixo15.length})',
               cor: Colors.orange.shade700,
-              texto:
-                  '$estoqueAbaixo produto${estoqueAbaixo > 1 ? 's' : ''} com estoque baixo (≤ 15 un)',
             ),
+            const SizedBox(height: 6),
+            ...produtosAbaixo15.map((p) => _LinhaAlertaProduto(
+                  produto: p,
+                  cor: Colors.orange.shade700,
+                  badge: '${p.quantidade} un',
+                  badgeCor: Colors.orange.shade700,
+                )),
+          ],
         ],
       ),
     );
   }
 }
 
-class _LinhaAlerta extends StatelessWidget {
-  final Color cor;
+class _SubtituloAlerta extends StatelessWidget {
   final String texto;
-  const _LinhaAlerta({required this.cor, required this.texto});
+  final Color cor;
+  const _SubtituloAlerta({required this.texto, required this.cor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      texto.toUpperCase(),
+      style: TextStyle(
+        fontSize: 10,
+        fontWeight: FontWeight.w800,
+        color: cor,
+        letterSpacing: 0.8,
+      ),
+    );
+  }
+}
+
+class _LinhaAlertaProduto extends StatelessWidget {
+  final Produto produto;
+  final Color cor;
+  final String badge;
+  final Color badgeCor;
+  const _LinhaAlertaProduto({
+    required this.produto,
+    required this.cor,
+    required this.badge,
+    required this.badgeCor,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         children: [
           Container(
-            width: 8,
-            height: 8,
+            width: 6,
+            height: 6,
             margin: const EdgeInsets.only(right: 8),
-            decoration:
-                BoxDecoration(color: cor, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: cor, shape: BoxShape.circle),
           ),
-          Text(texto,
-              style: TextStyle(fontSize: 12, color: cor)),
+          Expanded(
+            child: Text(
+              produto.nome,
+              style: TextStyle(fontSize: 12, color: cor, fontWeight: FontWeight.w500),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: badgeCor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              badge,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: badgeCor,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
 
 class _CardCategoria extends StatelessWidget {
   final Categoria categoria;
